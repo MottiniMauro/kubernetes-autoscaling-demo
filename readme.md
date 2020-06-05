@@ -84,3 +84,18 @@ And we can also open the kafka container again and start adding some messages in
 ```
 bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-topic
 ```
+
+## Notes
+
+Some good posts this was based one:
+
+- https://levelup.gitconnected.com/building-kubernetes-apps-with-custom-scaling-a-gentle-introduction-a332d7ebc795
+- https://medium.com/@ranrubin/horizontal-pod-autoscaling-hpa-triggered-by-kafka-event-f30fe99f3948
+- https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+
+Right now this runs with both the kafka-consumer-application and the kafka-exporter in the same Deployment, but it would be preferable to find a way to have the kafka exported as its own Deployment to avoid having it duplicated together with the application. A couple of ideas on how it may be possible to achive this could be:
+
+- Change how the metric is stored in prometheus so it seems it came from the kafka-consumer-application instead of the kafka-exported.
+- Configure the consumer-hpa.yaml (https://pursuit.purescript.org/packages/purescript-kubernetes/0.6.0/docs/Kubernetes.Api.Autoscaling.V2Beta1#t:MetricSpec) to change the metric type to object and check how we can configure the metric to consume it that way.
+- Wait until I get some answers in this issue https://github.com/DirectXMan12/k8s-prometheus-adapter/issues/295
+
