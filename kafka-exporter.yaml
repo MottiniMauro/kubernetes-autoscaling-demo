@@ -1,0 +1,41 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: kafka-exporter
+  labels:
+    app_name:  kafka-exporter
+spec:
+  revisionHistoryLimit: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 10
+  replicas: 1
+  selector:
+    matchLabels:
+      app_name:  kafka-exporter
+  template:
+    metadata:
+      labels:
+        app_name:  kafka-exporter
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9308'
+    spec:
+      containers:
+        - name: kafka-exporter
+          image: danielqsj/kafka-exporter:v1.2.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - kafka_exporter
+            - "--kafka.server=scraper-kafka-bootstrap:9092"
+          ports:
+            - name: http-metrics
+              containerPort: 9308
+          readinessProbe:
+            httpGet:
+              path: kafka-application
+              port: 9308
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
