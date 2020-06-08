@@ -97,5 +97,5 @@ Right now this runs with both the kafka-consumer-application and the kafka-expor
 
 - Change how the metric is stored in prometheus so it seems it came from the kafka-consumer-application instead of the kafka-exported.
 - Configure the consumer-hpa.yaml (https://pursuit.purescript.org/packages/purescript-kubernetes/0.6.0/docs/Kubernetes.Api.Autoscaling.V2Beta1#t:MetricSpec) to change the metric type to object and check how we can configure the metric to consume it that way.
-- Wait until I get some answers in this issue https://github.com/DirectXMan12/k8s-prometheus-adapter/issues/295
+- Wait until I get some answers in this github issue https://github.com/DirectXMan12/k8s-prometheus-adapter/issues/295 or this stackoverflow question https://stackoverflow.com/questions/62262647/kubernetes-hpa-using-metrics-from-another-deployment
 
