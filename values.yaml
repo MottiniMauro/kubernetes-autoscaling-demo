@@ -4,12 +4,16 @@ prometheus:
 rules:
   default: false
   resource: {}
-  custom:
+  external:
     - seriesQuery: 'kafka_consumergroup_lag'
       resources:
         overrides:
-          kubernetes_namespace: {resource: "namespace"}
-          kubernetes_pod_name: {resource: "pod"}
+          namespace:
+            resource: namespace
+          service:
+            resource: service
+          pod:
+            resource: pod
       name:
        matches: "kafka_consumergroup_lag"
        as: "kafka_consumergroup_lag"

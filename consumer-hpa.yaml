@@ -1,5 +1,5 @@
 kind: HorizontalPodAutoscaler
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2beta2
 metadata:
   name: consumer-hpa
 spec:
@@ -10,7 +10,10 @@ spec:
   minReplicas: 1
   maxReplicas: 10
   metrics:
-  - type: Pods
-    pods:
-      metricName: "kafka_consumergroup_lag"
-      targetAverageValue: 5
+  - type: External
+    external:
+      metric:
+        name: kafka_consumergroup_lag
+      target:
+        type: AverageValue
+        averageValue: 5

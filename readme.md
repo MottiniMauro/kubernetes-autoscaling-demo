@@ -56,13 +56,13 @@ kubectl -n consumer-test exec -it scraper-kafka-0 bash
 bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 10 --topic my-topic
 ```
 
-
 Something to note here is that in the case of kafka the numbers of partitions in the topic will limit the number of consumers we can have in the same consumer group, if we have 10 partitions we should make sure that we limit the autoscaler to 10 instances of the consumer.
 
 
-Run the application thats going to autoscale automatically and expose its metrics:
+Run the application thats going to autoscale automatically and the kafka exporter that exposed the kafka. metrics:
 ```
-kubectl -n consumer-test create -f kafka-consumer-application.yaml
+kubectl -n consumer-test create -f kafka-application.yaml
+kubectl -n consumer-test create -f kafka-exporter.yaml
 ```
 
 Now we need to run prometheus which will scrape the kafka exporting hitting its `GET /metrics` endpoint, and the prometheys adapter which exposes the prometheus metrics to the kubernetes metrics server. Notice that we are configuring the adapter using the values.yaml file which creates a new custom metric called kafka_consumergroup_lag and specifies the prometheus query needed to calculate it.
@@ -80,6 +80,7 @@ We can check that everything is running correctly with:
 ```
 kubectl -n consumer-test get all
 ```
+
 And we can also open the kafka container again and start adding some messages into the kafka topic, causing the lag to increase and the kafka-consumer-application to slace automatically:
 ```
 bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-topic
@@ -92,10 +93,4 @@ Some good posts this was based one:
 - https://levelup.gitconnected.com/building-kubernetes-apps-with-custom-scaling-a-gentle-introduction-a332d7ebc795
 - https://medium.com/@ranrubin/horizontal-pod-autoscaling-hpa-triggered-by-kafka-event-f30fe99f3948
 - https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
-
-Right now this runs with both the kafka-consumer-application and the kafka-exporter in the same Deployment, but it would be preferable to find a way to have the kafka exported as its own Deployment to avoid having it duplicated together with the application. A couple of ideas on how it may be possible to achive this could be:
-
-- Change how the metric is stored in prometheus so it seems it came from the kafka-consumer-application instead of the kafka-exported.
-- Configure the consumer-hpa.yaml (https://pursuit.purescript.org/packages/purescript-kubernetes/0.6.0/docs/Kubernetes.Api.Autoscaling.V2Beta1#t:MetricSpec) to change the metric type to object and check how we can configure the metric to consume it that way.
-- Wait until I get some answers in this github issue https://github.com/DirectXMan12/k8s-prometheus-adapter/issues/295 or this stackoverflow question https://stackoverflow.com/questions/62262647/kubernetes-hpa-using-metrics-from-another-deployment
 
